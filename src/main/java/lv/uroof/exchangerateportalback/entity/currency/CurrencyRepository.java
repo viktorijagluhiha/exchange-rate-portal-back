@@ -1,4 +1,4 @@
-package lv.uroof.exchangerateportalback.currency;
+package lv.uroof.exchangerateportalback.entity.currency;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

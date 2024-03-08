@@ -1,6 +1,6 @@
-package lv.uroof.exchangerateportalback.exchangerate;
+package lv.uroof.exchangerateportalback.entity.exchangerate;
 
-import lv.uroof.exchangerateportalback.currency.CurrencyDO;
+import lv.uroof.exchangerateportalback.entity.currency.CurrencyDO;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;

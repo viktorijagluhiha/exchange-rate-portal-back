@@ -1,9 +1,9 @@
-package lv.uroof.exchangerateportalback.exchangerate;
+package lv.uroof.exchangerateportalback.entity.exchangerate;
 
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lv.uroof.exchangerateportalback.currency.CurrencyDO;
+import lv.uroof.exchangerateportalback.entity.currency.CurrencyDO;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

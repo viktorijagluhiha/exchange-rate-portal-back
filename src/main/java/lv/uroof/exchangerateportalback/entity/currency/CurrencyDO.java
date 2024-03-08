@@ -1,4 +1,4 @@
-package lv.uroof.exchangerateportalback.currency;
+package lv.uroof.exchangerateportalback.entity.currency;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -24,4 +24,10 @@ public class CurrencyDO {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "numeric_code")
+    private Short numericCode;
+
+    @Column(name = "minor_units")
+    private Short minorUnits;
 }
