@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lv.uroof.exchangerateportalback.entity.currency.xml.CurrenciesXMLO;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @XmlRootElement(name = "FxRate", namespace = CurrenciesXMLO.NAMESPACE)
@@ -20,7 +19,7 @@ public class ExchangeRateXMLO {
     private String type;
 
     @XmlElement(name = "Dt", namespace = CurrenciesXMLO.NAMESPACE)
-    private LocalDate date;
+    private String date;
 
     @XmlElement(name = "CcyAmt", namespace = CurrenciesXMLO.NAMESPACE)
     private List<ExchangeRateAmountWrapperXMLO> amounts;

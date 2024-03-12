@@ -28,8 +28,10 @@ public class ExchangeRatePortalBackApplication {
                 .baseUrl(centralBankAPIProperties.getUrl())
                 .exchangeStrategies(
                         ExchangeStrategies.builder()
-                                .codecs(configurer ->
-                                        configurer.defaultCodecs().jaxb2Decoder(new Jaxb2XmlDecoder()))
+                                .codecs(configurer -> {
+                                    configurer.defaultCodecs().maxInMemorySize(16 * 1024 * 1024);
+                                    configurer.defaultCodecs().jaxb2Decoder(new Jaxb2XmlDecoder());
+                                })
                                 .build()
                 )
                 .build();

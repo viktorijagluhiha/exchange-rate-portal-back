@@ -14,9 +14,9 @@ import java.time.LocalDate;
 @Table(
         name = "exchange_rates",
         indexes = {
-                @Index(name = "i_date_currency_from_currency_to", unique = true, columnList = "date, currency_from_id, currency_to_id"),
-                @Index(name = "i_currency_from_id", columnList = "currency_from_id"),
-                @Index(name = "i_currency_to_id", columnList = "currency_to_id"),
+                @Index(name = "i_date_currency_base_currency_quote", unique = true, columnList = "date, currency_base_id, currency_quote_id"),
+                @Index(name = "i_currency_base_id", columnList = "currency_base_id"),
+                @Index(name = "i_currency_quote_id", columnList = "currency_quote_id"),
         }
 )
 public class ExchangeRateDO {
@@ -29,16 +29,16 @@ public class ExchangeRateDO {
     private LocalDate date;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "currency_from_id", nullable = false)
-    private CurrencyDO currencyFrom;
+    @JoinColumn(name = "currency_base_id", nullable = false)
+    private CurrencyDO currencyBase;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "currency_to_id", nullable = false)
-    private CurrencyDO currencyTo;
+    @JoinColumn(name = "currency_quote_id", nullable = false)
+    private CurrencyDO currencyQuote;
 
-    @Column(name = "currency_from_amount", nullable = false, precision = 27, scale = 7)
-    private BigDecimal currencyFromAmount;
+    @Column(name = "currency_base_amount", nullable = false, precision = 27, scale = 7)
+    private BigDecimal currencyBaseAmount;
 
-    @Column(name = "currency_to_amount", nullable = false, precision = 27, scale = 7)
-    private BigDecimal currencyToAmount;
+    @Column(name = "currency_quote_amount", nullable = false, precision = 27, scale = 7)
+    private BigDecimal currencyQuoteAmount;
 }
