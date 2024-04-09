@@ -25,7 +25,7 @@ public class ExchangeRateDO {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(name = "date", nullable = false)
+    @Column(name = "date", nullable = false, columnDefinition = "DATE")
     private LocalDate date;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -25,6 +25,11 @@ public abstract class ExchangeRateMapper {
     @Mapping(target = "currencyQuoteAmount", ignore = true)
     public abstract ExchangeRateDO exchangeRateXMLOToExchangeRateDO(ExchangeRateXMLO exchangeRateXMLO);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "currencyBase", ignore = true)
+    @Mapping(target = "currencyQuote", ignore = true)
+    public abstract ExchangeRateDO exchangeRateRequestDTOToExchangeRateDO(ExchangeRateRequestDTO exchangeRate);
+
     @Mapping(target = "currencyBaseCode", source = "currencyBase.code")
     @Mapping(target = "currencyQuoteCode", source = "currencyQuote.code")
     public abstract ExchangeRateResponseDTO exchangeRateDOToExchangeRateResponseDTO(ExchangeRateDO exchangeRateDO);
@@ -58,5 +63,15 @@ public abstract class ExchangeRateMapper {
                 exchangeRateQuoteAmount.getCurrencyCode()
         ).orElseThrow(() -> new RuntimeException("Currency with code " + exchangeRateQuoteAmount.getCurrencyCode() + " not found")));
         exchangeRateDO.setCurrencyQuoteAmount(exchangeRateQuoteAmount.getAmount());
+    }
+
+    @AfterMapping
+    public void setExchangeRateCurrencies(@MappingTarget ExchangeRateDO exchangeRateDO, ExchangeRateRequestDTO exchangeRate) {
+        exchangeRateDO.setCurrencyBase(currencyRepository.findByCode(
+            exchangeRate.getCurrencyBaseCode()
+        ).orElseThrow(() -> new RuntimeException("Currency with code " + exchangeRate.getCurrencyBaseCode() + " not found")));
+        exchangeRateDO.setCurrencyQuote(currencyRepository.findByCode(
+            exchangeRate.getCurrencyQuoteCode()
+        ).orElseThrow(() -> new RuntimeException("Currency with code " + exchangeRate.getCurrencyQuoteCode() + " not found")));
     }
 }

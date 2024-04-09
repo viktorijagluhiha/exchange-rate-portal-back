@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface ExchangeRateRepository extends JpaRepository<ExchangeRateDO, Long> {
     Optional<ExchangeRateDO> findByDateAndCurrencyBaseAndCurrencyQuote(LocalDate date, CurrencyDO currencyBase, CurrencyDO currencyQuote);
+    Optional<ExchangeRateDO> findFirstByDateAfterAndCurrencyBaseAndCurrencyQuoteOrderByDateDesc(LocalDate date, CurrencyDO currencyBase, CurrencyDO currencyQuote);
     List<ExchangeRateDO> findAllByCurrencyQuote(CurrencyDO currencyQuote);
     List<ExchangeRateDO> findAllByCurrencyBase(CurrencyDO currencyBase);
 }
