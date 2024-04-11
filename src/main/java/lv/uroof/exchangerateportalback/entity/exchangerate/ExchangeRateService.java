@@ -24,78 +24,72 @@ public class ExchangeRateService {
     public ExchangeRateResponseDTO createExchangeRate(ExchangeRateXMLO exchangeRate) {
         ExchangeRateDO exchangeRateDO = exchangeRateMapper.exchangeRateXMLOToExchangeRateDO(exchangeRate);
 
-        Optional<ExchangeRateDO> optionalExchangeRateDO = exchangeRateRepository.findByDateAndCurrencyBaseAndCurrencyQuote(
-                exchangeRateDO.getDate(),
-                exchangeRateDO.getCurrencyBase(),
-                exchangeRateDO.getCurrencyQuote()
-        );
-        if (optionalExchangeRateDO.isPresent()) {
-            return exchangeRateMapper.exchangeRateDOToExchangeRateResponseDTO(optionalExchangeRateDO.get());
-        }
-
-        exchangeRateRepository.save(exchangeRateDO);
-
-        return exchangeRateMapper.exchangeRateDOToExchangeRateResponseDTO(exchangeRateDO);
+        ExchangeRateDO exchangeRateData = exchangeRateRepository
+                .findByDateAndCurrencyBaseAndCurrencyQuote(
+                        exchangeRateDO.getDate(),
+                        exchangeRateDO.getCurrencyBase(),
+                        exchangeRateDO.getCurrencyQuote()
+                )
+                .orElseGet(() -> exchangeRateRepository.save(exchangeRateDO));
+        return exchangeRateMapper.exchangeRateDOToExchangeRateResponseDTO(exchangeRateData);
     }
 
     public ExchangeRateResponseDTO createExchangeRate(ExchangeRateRequestDTO exchangeRate) {
         ExchangeRateDO exchangeRateDO = exchangeRateMapper.exchangeRateRequestDTOToExchangeRateDO(exchangeRate);
 
-        Optional<ExchangeRateDO> optionalExchangeRateDO = exchangeRateRepository.findByDateAndCurrencyBaseAndCurrencyQuote(
-                exchangeRateDO.getDate(),
-                exchangeRateDO.getCurrencyBase(),
-                exchangeRateDO.getCurrencyQuote()
-        );
-        if (optionalExchangeRateDO.isPresent()) {
-            return exchangeRateMapper.exchangeRateDOToExchangeRateResponseDTO(optionalExchangeRateDO.get());
-        }
-
-        exchangeRateRepository.save(exchangeRateDO);
-
-        return exchangeRateMapper.exchangeRateDOToExchangeRateResponseDTO(exchangeRateDO);
+        ExchangeRateDO exchangeRateData = exchangeRateRepository
+                .findByDateAndCurrencyBaseAndCurrencyQuote(
+                        exchangeRateDO.getDate(),
+                        exchangeRateDO.getCurrencyBase(),
+                        exchangeRateDO.getCurrencyQuote()
+                )
+                .orElseGet(() -> exchangeRateRepository.save(exchangeRateDO));
+        return exchangeRateMapper.exchangeRateDOToExchangeRateResponseDTO(exchangeRateData);
     }
 
-    public ExchangeRateResponseDTO getExchangeRate(Long id) {
-        Optional<ExchangeRateDO> exchangeRateDO = exchangeRateRepository.findById(id);
-        return exchangeRateDO.map(exchangeRateMapper::exchangeRateDOToExchangeRateResponseDTO).orElse(null);
+    public Optional<ExchangeRateResponseDTO> getExchangeRate(Long id) {
+        return exchangeRateRepository
+                .findById(id)
+                .map(exchangeRateMapper::exchangeRateDOToExchangeRateResponseDTO);
     }
 
-    public ExchangeRateResponseDTO getExchangeRateLastByCurrencyBaseAndCurrencyQuote(
+    public Optional<ExchangeRateResponseDTO> getExchangeRateLastByCurrencyBaseAndCurrencyQuote(
             LocalDate date,
             String currencyBaseCode,
             String currencyQuoteCode
     ) {
-        Optional<CurrencyDO> currencyBaseDO = currencyRepository.findByCode(currencyBaseCode);
-        Optional<CurrencyDO> currencyQuoteDO = currencyRepository.findByCode(currencyQuoteCode);
-
-        if (currencyBaseDO.isPresent() && currencyQuoteDO.isPresent()) {
-            Optional<ExchangeRateDO> exchangeRateDO = exchangeRateRepository.findFirstByDateAfterAndCurrencyBaseAndCurrencyQuoteOrderByDateDesc(
-                    date,
-                    currencyBaseDO.get(),
-                    currencyQuoteDO.get()
-            );
-            return exchangeRateDO.map(exchangeRateMapper::exchangeRateDOToExchangeRateResponseDTO).orElse(null);
-        }
-        return null;
+        return currencyRepository
+                .findByCode(currencyBaseCode)
+                .flatMap(currencyBaseDO -> currencyRepository
+                        .findByCode(currencyQuoteCode)
+                        .flatMap(currencyQuoteDO -> exchangeRateRepository
+                                .findFirstByDateBeforeAndCurrencyBaseAndCurrencyQuoteOrderByDateDesc(
+                                        date,
+                                        currencyBaseDO,
+                                        currencyQuoteDO
+                                ))
+                )
+               .map(exchangeRateMapper::exchangeRateDOToExchangeRateResponseDTO);
     }
 
-    public ExchangeRateResponseDTO updateExchangeRate(Long id, ExchangeRateRequestDTO exchangeRate) {
-        Optional<ExchangeRateDO> exchangeRateData = exchangeRateRepository.findById(id);
-        if (exchangeRateData.isPresent()) {
-            ExchangeRateDO exchangeRateDO = exchangeRateMapper.exchangeRateRequestDTOToExchangeRateDO(exchangeRate);
-            exchangeRateDO.setId(id);
+    public Optional<ExchangeRateResponseDTO> updateExchangeRate(Long id, ExchangeRateRequestDTO exchangeRate) {
+        return exchangeRateRepository
+                .findById(id)
+                .map(exchangeRateData -> {
+                    ExchangeRateDO exchangeRateDO = exchangeRateMapper.exchangeRateRequestDTOToExchangeRateDO(exchangeRate);
+                    exchangeRateDO.setId(id);
 
-            return exchangeRateMapper.exchangeRateDOToExchangeRateResponseDTO(exchangeRateRepository.save(exchangeRateDO));
-        }
-        return null;
+                    return exchangeRateRepository.save(exchangeRateDO);
+                })
+                .map(exchangeRateMapper::exchangeRateDOToExchangeRateResponseDTO);
     }
 
-    public Long deleteExchangeRate(Long id) {
-        Optional<ExchangeRateDO> exchangeRateDO = exchangeRateRepository.findById(id);
-        if (exchangeRateDO.isPresent()) {
-            exchangeRateRepository.delete(exchangeRateDO.get());
-            return id;
-        }
-        return null;
+    public Optional<Long> deleteExchangeRate(Long id) {
+        return exchangeRateRepository
+                .findById(id)
+                .map(exchangeRateDO -> {
+                    exchangeRateRepository.delete(exchangeRateDO);
+                    return id;
+                });
     }
 }

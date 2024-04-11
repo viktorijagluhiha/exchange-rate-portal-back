@@ -18,37 +18,33 @@ public class CurrencyService {
     }
 
     public CurrencyResponseDTO createCurrency(CurrencyXMLO currency) {
-        Optional<CurrencyDO> currencyData = currencyRepository.findByCode(currency.getCode());
-        if (currencyData.isPresent()) {
-            return currencyMapper.currencyDOToCurrencyResponseDTO(currencyData.get());
-        }
-
-        CurrencyDO currencyDO = currencyMapper.currencyXMLOToCurrencyDO(currency);
-        currencyRepository.save(currencyDO);
-
-        return currencyMapper.currencyDOToCurrencyResponseDTO(currencyDO);
+        CurrencyDO currencyData = currencyRepository
+                .findByCode(currency.getCode())
+                .orElseGet(() -> currencyRepository.save(
+                        currencyMapper.currencyXMLOToCurrencyDO(currency)
+                ));
+        return currencyMapper.currencyDOToCurrencyResponseDTO(currencyData);
     }
 
     public CurrencyResponseDTO createCurrency(CurrencyRequestDTO currency) {
-        Optional<CurrencyDO> currencyData = currencyRepository.findByCode(currency.getCode());
-        if (currencyData.isPresent()) {
-            return currencyMapper.currencyDOToCurrencyResponseDTO(currencyData.get());
-        }
-
-        CurrencyDO currencyDO = currencyMapper.currencyRequestDTOToCurrencyDO(currency);
-        currencyRepository.save(currencyDO);
-
-        return currencyMapper.currencyDOToCurrencyResponseDTO(currencyDO);
+        CurrencyDO currencyData = currencyRepository
+                .findByCode(currency.getCode())
+                .orElseGet(() -> currencyRepository.save(
+                        currencyMapper.currencyRequestDTOToCurrencyDO(currency)
+                ));
+        return currencyMapper.currencyDOToCurrencyResponseDTO(currencyData);
     }
 
-    public CurrencyResponseDTO getCurrency(Long id) {
-        Optional<CurrencyDO> currencyDO = currencyRepository.findById(id);
-        return currencyDO.map(currencyMapper::currencyDOToCurrencyResponseDTO).orElse(null);
+    public Optional<CurrencyResponseDTO> getCurrency(Long id) {
+        return currencyRepository
+                .findById(id)
+                .map(currencyMapper::currencyDOToCurrencyResponseDTO);
     }
 
-    public CurrencyResponseDTO getCurrencyByCode(String code) {
-        Optional<CurrencyDO> currencyDO = currencyRepository.findByCode(code);
-        return currencyDO.map(currencyMapper::currencyDOToCurrencyResponseDTO).orElse(null);
+    public Optional<CurrencyResponseDTO> getCurrencyByCode(String code) {
+        return currencyRepository
+                .findByCode(code)
+                .map(currencyMapper::currencyDOToCurrencyResponseDTO);
     }
 
     public List<CurrencyResponseDTO> getCurrencies() {
@@ -59,24 +55,24 @@ public class CurrencyService {
                 .collect(Collectors.toList());
     }
 
-    public CurrencyResponseDTO updateCurrency(Long id, CurrencyRequestDTO currency) {
-        Optional<CurrencyDO> currencyData = currencyRepository.findById(id);
-        if (currencyData.isPresent()) {
-            CurrencyDO currencyDO = currencyMapper.currencyRequestDTOToCurrencyDO(currency);
-            currencyDO.setId(id);
+    public Optional<CurrencyResponseDTO> updateCurrency(Long id, CurrencyRequestDTO currency) {
+        return currencyRepository
+                .findById(id)
+                .map(currencyData -> {
+                    CurrencyDO currencyDO = currencyMapper.currencyRequestDTOToCurrencyDO(currency);
+                    currencyDO.setId(id);
 
-            return currencyMapper.currencyDOToCurrencyResponseDTO(currencyRepository.save(currencyDO));
-        } else {
-            return null;
-        }
+                    return currencyRepository.save(currencyDO);
+                })
+                .map(currencyMapper::currencyDOToCurrencyResponseDTO);
     }
 
-    public Long deleteCurrency(Long id) {
-        Optional<CurrencyDO> currencyDO = currencyRepository.findById(id);
-        if (currencyDO.isPresent()) {
-            currencyRepository.deleteById(id);
-            return id;
-        }
-        return null;
+    public Optional<Long> deleteCurrency(Long id) {
+        return currencyRepository
+                .findById(id)
+                .map(currencyDO -> {
+                    currencyRepository.delete(currencyDO);
+                    return id;
+                });
     }
 }
