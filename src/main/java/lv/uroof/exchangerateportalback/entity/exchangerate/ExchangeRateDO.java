@@ -2,14 +2,12 @@ package lv.uroof.exchangerateportalback.entity.exchangerate;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lv.uroof.exchangerateportalback.entity.currency.CurrencyDO;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(
         name = "exchange_rates",
@@ -22,7 +20,6 @@ import java.time.LocalDate;
 public class ExchangeRateDO {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "date", nullable = false, columnDefinition = "DATE")

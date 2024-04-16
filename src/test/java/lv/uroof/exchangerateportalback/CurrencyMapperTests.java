@@ -65,10 +65,6 @@ public class CurrencyMapperTests {
     @Test
     void currencyXMLOToCurrencyDOTest() {
         CurrencyDO result = currencyMapper.currencyXMLOToCurrencyDO(currencyXMLO);
-        Assertions.assertEquals(currencyDO.getId(), result.getId());
-        Assertions.assertEquals(currencyDO.getCode(), result.getCode());
-        Assertions.assertEquals(currencyDO.getNumericCode(), result.getNumericCode());
-        Assertions.assertEquals(currencyDO.getMinorUnits(), result.getMinorUnits());
-        Assertions.assertEquals(currencyDO.getName(), result.getName());
+        Assertions.assertEquals(currencyDO, result);
     }
 }

@@ -2,10 +2,8 @@ package lv.uroof.exchangerateportalback.entity.currency;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(
         name = "currencies",
@@ -16,7 +14,6 @@ import lombok.EqualsAndHashCode;
 public class CurrencyDO {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "code", nullable = false)
