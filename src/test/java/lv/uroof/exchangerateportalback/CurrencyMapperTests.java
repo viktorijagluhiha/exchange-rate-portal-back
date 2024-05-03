@@ -1,8 +1,6 @@
 package lv.uroof.exchangerateportalback;
 
-import lv.uroof.exchangerateportalback.entity.currency.CurrencyDO;
-import lv.uroof.exchangerateportalback.entity.currency.CurrencyMapper;
-import lv.uroof.exchangerateportalback.entity.currency.CurrencyMapperImpl;
+import lv.uroof.exchangerateportalback.entity.currency.*;
 import lv.uroof.exchangerateportalback.entity.currency.xml.CurrencyNameTranslationXMLO;
 import lv.uroof.exchangerateportalback.entity.currency.xml.CurrencyXMLO;
 import org.junit.jupiter.api.Assertions;
@@ -23,6 +21,8 @@ public class CurrencyMapperTests {
 
     private static CurrencyXMLO currencyXMLO;
     private static CurrencyDO currencyDO;
+    private static CurrencyResponseDTO currencyResponseDTO;
+    private static CurrencyRequestDTO currencyRequestDTO;
 
     private static void initializeCurrencyXMLOUSD() {
         currencyXMLO = new CurrencyXMLO();
@@ -56,15 +56,66 @@ public class CurrencyMapperTests {
         currencyDO.setName("US dollar");
     }
 
+    private static void initializeCurrencyResponseDTOUSD() {
+        currencyResponseDTO = new CurrencyResponseDTO();
+
+        currencyResponseDTO.setId(null);
+        currencyResponseDTO.setCode("USD");
+        currencyResponseDTO.setNumericCode((short) 840);
+        currencyResponseDTO.setMinorUnits((short) 2);
+        currencyResponseDTO.setName("US dollar");
+    }
+
+    private static void initializeCurrencyRequestDTOUSD() {
+        currencyRequestDTO = new CurrencyRequestDTO();
+
+        currencyRequestDTO.setCode("USD");
+        currencyRequestDTO.setNumericCode((short) 840);
+        currencyRequestDTO.setMinorUnits((short) 2);
+        currencyRequestDTO.setName("US dollar");
+    }
+
     @BeforeAll
     static void initialize() {
         initializeCurrencyXMLOUSD();
         initializeCurrencyDOUSD();
+        initializeCurrencyResponseDTOUSD();
+        initializeCurrencyRequestDTOUSD();
     }
 
     @Test
     void currencyXMLOToCurrencyDOTest() {
         CurrencyDO result = currencyMapper.currencyXMLOToCurrencyDO(currencyXMLO);
         Assertions.assertEquals(currencyDO, result);
+    }
+
+    @Test
+    void currencyDOToCurrencyResponseDTOTest() {
+        CurrencyResponseDTO result = currencyMapper.currencyDOToCurrencyResponseDTO(currencyDO);
+        Assertions.assertEquals(currencyResponseDTO, result);
+    }
+
+    @Test
+    void currencyRequestDTOToCurrencyDOTest() {
+        CurrencyDO result = currencyMapper.currencyRequestDTOToCurrencyDO(currencyRequestDTO);
+        Assertions.assertEquals(currencyDO, result);
+    }
+
+    @Test
+    void currencyXMLOToCurrencyDONullTest() {
+        CurrencyDO result = currencyMapper.currencyXMLOToCurrencyDO(null);
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    void currencyDOToCurrencyResponseDTONullTest() {
+        CurrencyResponseDTO result = currencyMapper.currencyDOToCurrencyResponseDTO(null);
+        Assertions.assertNull(result);
+    }
+
+    @Test
+    void currencyRequestDTOToCurrencyDONullTest() {
+        CurrencyDO result = currencyMapper.currencyRequestDTOToCurrencyDO(null);
+        Assertions.assertNull(result);
     }
 }
