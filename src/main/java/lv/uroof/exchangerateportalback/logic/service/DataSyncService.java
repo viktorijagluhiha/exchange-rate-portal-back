@@ -6,7 +6,6 @@ import lv.uroof.exchangerateportalback.entity.exchangerate.ExchangeRateResponseD
 import lv.uroof.exchangerateportalback.entity.exchangerate.ExchangeRateService;
 import org.springframework.stereotype.Service;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,7 +16,9 @@ public class DataSyncService {
     private final CurrencyService currencyService;
     private final ExchangeRateService exchangeRateService;
 
-    public final static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private List<CurrencyResponseDTO> currencies;
+
+    private static final List<String> CURRENCIES_BASE_CODES = List.of("EUR", "LTL");
 
     public DataSyncService(CentralBankAPIService centralBankAPIService, CurrencyService currencyService, ExchangeRateService exchangeRateService) {
         this.centralBankAPIService = centralBankAPIService;
@@ -25,10 +26,20 @@ public class DataSyncService {
         this.exchangeRateService = exchangeRateService;
     }
 
-    public List<CurrencyResponseDTO> synchronizeCurrencies() {
-        return centralBankAPIService
+    public void synchronizeAllData() {
+//        this.currencies
+//                .parallelStream()
+//                .map((currencyResponseDTO) -> {
+//                    this.currencies
+//                            .parallelStream()
+//
+//                })
+    }
+
+    public void synchronizeCurrencies() {
+        this.currencies = centralBankAPIService
                 .getCurrencies()
-                .stream()
+                .parallelStream()
                 .map(currencyService::createCurrency)
                 .collect(Collectors.toList());
     }
