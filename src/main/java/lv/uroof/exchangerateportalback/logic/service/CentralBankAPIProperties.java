@@ -16,7 +16,14 @@ public class CentralBankAPIProperties {
         private String getExchangeRateForCurrencyDateRange;
     }
 
+    @Data
+    public static class Dates {
+        private String format;
+        private String start;
+    }
+
     private String url;
 
     private final Endpoints endpoints = new Endpoints();
+    private final Dates dates = new Dates();
 }

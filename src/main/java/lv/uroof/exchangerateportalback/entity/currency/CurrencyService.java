@@ -3,9 +3,9 @@ package lv.uroof.exchangerateportalback.entity.currency;
 import lv.uroof.exchangerateportalback.entity.currency.xml.CurrencyXMLO;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class CurrencyService {
@@ -17,45 +17,38 @@ public class CurrencyService {
         this.currencyMapper = currencyMapper;
     }
 
-    public CurrencyResponseDTO createCurrency(CurrencyXMLO currency) {
-        CurrencyDO currencyData = currencyRepository
+    public CurrencyDO createCurrency(CurrencyXMLO currency) {
+        return currencyRepository
                 .findByCode(currency.getCode())
                 .orElseGet(() -> currencyRepository.save(
                         currencyMapper.currencyXMLOToCurrencyDO(currency)
                 ));
-        return currencyMapper.currencyDOToCurrencyResponseDTO(currencyData);
     }
 
-    public CurrencyResponseDTO createCurrency(CurrencyRequestDTO currency) {
-        CurrencyDO currencyData = currencyRepository
+    public CurrencyDO createCurrency(CurrencyRequestDTO currency) {
+        return currencyRepository
                 .findByCode(currency.getCode())
                 .orElseGet(() -> currencyRepository.save(
                         currencyMapper.currencyRequestDTOToCurrencyDO(currency)
                 ));
-        return currencyMapper.currencyDOToCurrencyResponseDTO(currencyData);
     }
 
-    public Optional<CurrencyResponseDTO> getCurrency(Long id) {
+    public Optional<CurrencyDO> getCurrency(Long id) {
         return currencyRepository
-                .findById(id)
-                .map(currencyMapper::currencyDOToCurrencyResponseDTO);
+                .findById(id);
     }
 
-    public Optional<CurrencyResponseDTO> getCurrencyByCode(String code) {
+    public Optional<CurrencyDO> getCurrencyByCode(String code) {
         return currencyRepository
-                .findByCode(code)
-                .map(currencyMapper::currencyDOToCurrencyResponseDTO);
+                .findByCode(code);
     }
 
-    public List<CurrencyResponseDTO> getCurrencies() {
-        return currencyRepository
-                .findAll()
-                .stream()
-                .map(currencyMapper::currencyDOToCurrencyResponseDTO)
-                .collect(Collectors.toList());
+    public List<CurrencyDO> getCurrencies() {
+        return new ArrayList<>(currencyRepository
+                .findAll());
     }
 
-    public Optional<CurrencyResponseDTO> updateCurrency(Long id, CurrencyRequestDTO currency) {
+    public Optional<CurrencyDO> updateCurrency(Long id, CurrencyRequestDTO currency) {
         return currencyRepository
                 .findById(id)
                 .map(currencyData -> {
@@ -63,8 +56,7 @@ public class CurrencyService {
                     currencyDO.setId(id);
 
                     return currencyRepository.save(currencyDO);
-                })
-                .map(currencyMapper::currencyDOToCurrencyResponseDTO);
+                });
     }
 
     public Optional<Long> deleteCurrency(Long id) {

@@ -1,5 +1,6 @@
 package lv.uroof.exchangerateportalback.logic.service;
 
+import lv.uroof.exchangerateportalback.entity.currency.CurrencyDO;
 import lv.uroof.exchangerateportalback.entity.currency.xml.CurrenciesXMLO;
 import lv.uroof.exchangerateportalback.entity.currency.xml.CurrencyXMLO;
 import lv.uroof.exchangerateportalback.entity.exchangerate.xml.ExchangeRateXMLO;
@@ -7,7 +8,10 @@ import lv.uroof.exchangerateportalback.entity.exchangerate.xml.ExchangeRatesXMLO
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CentralBankAPIService {
@@ -34,15 +38,18 @@ public class CentralBankAPIService {
                 .block();
     }
 
-    public List<ExchangeRateXMLO> getExchangeRatesForCurrencyBetweenDates(String currencyCode, String dateFrom, String dateTo) {
+    public List<ExchangeRateXMLO> getExchangeRatesForCurrencyBetweenDates(CurrencyDO currency, Optional<LocalDate> dateFrom, LocalDate dateTo) {
         return webClient
                 .get()
                 .uri(builder -> builder
                         .path(centralBankAPIProperties.getEndpoints().getGetExchangeRateForCurrencyDateRange())
                         .queryParam("tp", ExchangeRateType.LT.name())
-                        .queryParam("ccy", currencyCode)
-                        .queryParam("dtFrom", dateFrom)
-                        .queryParam("dtTo", dateTo)
+                        .queryParam("ccy", currency.getCode())
+                        .queryParam("dtFrom", dateFrom
+                                .map(date -> date.format(DateTimeFormatter.ofPattern(centralBankAPIProperties.getDates().getFormat())))
+                                .orElse(centralBankAPIProperties.getDates().getStart()))
+                        .queryParam("dtTo", dateTo
+                                .format(DateTimeFormatter.ofPattern(centralBankAPIProperties.getDates().getFormat())))
                         .build()
                 )
                 .retrieve()

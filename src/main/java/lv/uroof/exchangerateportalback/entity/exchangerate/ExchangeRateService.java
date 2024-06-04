@@ -1,7 +1,6 @@
 package lv.uroof.exchangerateportalback.entity.exchangerate;
 
 import lv.uroof.exchangerateportalback.entity.currency.CurrencyDO;
-import lv.uroof.exchangerateportalback.entity.currency.CurrencyRepository;
 import lv.uroof.exchangerateportalback.entity.currency.CurrencyService;
 import lv.uroof.exchangerateportalback.entity.exchangerate.xml.ExchangeRateXMLO;
 import org.springframework.stereotype.Service;
@@ -13,66 +12,67 @@ import java.util.Optional;
 public class ExchangeRateService {
     private final ExchangeRateRepository exchangeRateRepository;
     private final ExchangeRateMapper exchangeRateMapper;
-    private final CurrencyRepository currencyRepository;
 
-    public ExchangeRateService(ExchangeRateRepository exchangeRateRepository, ExchangeRateMapper exchangeRateMapper, CurrencyService currencyService, CurrencyRepository currencyRepository) {
+    public ExchangeRateService(ExchangeRateRepository exchangeRateRepository, ExchangeRateMapper exchangeRateMapper, CurrencyService currencyService) {
         this.exchangeRateRepository = exchangeRateRepository;
         this.exchangeRateMapper = exchangeRateMapper;
-        this.currencyRepository = currencyRepository;
     }
 
-    public ExchangeRateResponseDTO createExchangeRate(ExchangeRateXMLO exchangeRate) {
+    public ExchangeRateDO createExchangeRate(ExchangeRateXMLO exchangeRate) {
         ExchangeRateDO exchangeRateDO = exchangeRateMapper.exchangeRateXMLOToExchangeRateDO(exchangeRate);
 
-        ExchangeRateDO exchangeRateData = exchangeRateRepository
+        return exchangeRateRepository
                 .findByDateAndCurrencyBaseAndCurrencyQuote(
                         exchangeRateDO.getDate(),
                         exchangeRateDO.getCurrencyBase(),
                         exchangeRateDO.getCurrencyQuote()
                 )
                 .orElseGet(() -> exchangeRateRepository.save(exchangeRateDO));
-        return exchangeRateMapper.exchangeRateDOToExchangeRateResponseDTO(exchangeRateData);
     }
 
-    public ExchangeRateResponseDTO createExchangeRate(ExchangeRateRequestDTO exchangeRate) {
+    public ExchangeRateDO createExchangeRate(ExchangeRateRequestDTO exchangeRate) {
         ExchangeRateDO exchangeRateDO = exchangeRateMapper.exchangeRateRequestDTOToExchangeRateDO(exchangeRate);
 
-        ExchangeRateDO exchangeRateData = exchangeRateRepository
+        return exchangeRateRepository
                 .findByDateAndCurrencyBaseAndCurrencyQuote(
                         exchangeRateDO.getDate(),
                         exchangeRateDO.getCurrencyBase(),
                         exchangeRateDO.getCurrencyQuote()
                 )
                 .orElseGet(() -> exchangeRateRepository.save(exchangeRateDO));
-        return exchangeRateMapper.exchangeRateDOToExchangeRateResponseDTO(exchangeRateData);
     }
 
-    public Optional<ExchangeRateResponseDTO> getExchangeRate(Long id) {
+    public Optional<ExchangeRateDO> getExchangeRate(Long id) {
         return exchangeRateRepository
-                .findById(id)
-                .map(exchangeRateMapper::exchangeRateDOToExchangeRateResponseDTO);
+                .findById(id);
     }
 
-    public Optional<ExchangeRateResponseDTO> getExchangeRateLastByCurrencyBaseAndCurrencyQuote(
+    public Optional<ExchangeRateDO> getExchangeRateLastByCurrencyBaseAndCurrencyQuote(
             LocalDate date,
-            String currencyBaseCode,
-            String currencyQuoteCode
+            CurrencyDO currencyBase,
+            CurrencyDO currencyQuote
     ) {
-        return currencyRepository
-                .findByCode(currencyBaseCode)
-                .flatMap(currencyBaseDO -> currencyRepository
-                        .findByCode(currencyQuoteCode)
-                        .flatMap(currencyQuoteDO -> exchangeRateRepository
-                                .findFirstByDateBeforeAndCurrencyBaseAndCurrencyQuoteOrderByDateDesc(
-                                        date,
-                                        currencyBaseDO,
-                                        currencyQuoteDO
-                                ))
-                )
-               .map(exchangeRateMapper::exchangeRateDOToExchangeRateResponseDTO);
+        return exchangeRateRepository
+                .findFirstByDateBeforeAndCurrencyBaseAndCurrencyQuoteOrderByDateDesc(
+                        date,
+                        currencyBase,
+                        currencyQuote
+                );
     }
 
-    public Optional<ExchangeRateResponseDTO> updateExchangeRate(Long id, ExchangeRateRequestDTO exchangeRate) {
+    public Optional<ExchangeRateDO> getExchangeRateLastByCurrency(
+            LocalDate date,
+            CurrencyDO currency
+    ) {
+        return exchangeRateRepository
+                .findFirstByDateBeforeAndCurrencyBaseOrCurrencyQuoteOrderByDateDesc(
+                        date,
+                        currency,
+                        currency
+                );
+    }
+
+    public Optional<ExchangeRateDO> updateExchangeRate(Long id, ExchangeRateRequestDTO exchangeRate) {
         return exchangeRateRepository
                 .findById(id)
                 .map(exchangeRateData -> {
@@ -80,8 +80,7 @@ public class ExchangeRateService {
                     exchangeRateDO.setId(id);
 
                     return exchangeRateRepository.save(exchangeRateDO);
-                })
-                .map(exchangeRateMapper::exchangeRateDOToExchangeRateResponseDTO);
+                });
     }
 
     public Optional<Long> deleteExchangeRate(Long id) {
